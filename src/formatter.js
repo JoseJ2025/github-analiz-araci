@@ -115,6 +115,9 @@ export function formatAnalysis(analysis) {
     lines.push(`  • Total Lines:    ${chalk.cyan(totalLines)} ${chalk.gray(`(Source Code: ${codeLines})`)}`);
     lines.push(`  • Tracked Files:  ${chalk.cyan(analysis.totalFiles.toLocaleString())} files`);
     lines.push(`  • LLM Context:    ~${chalk.yellow.bold(tokens)} tokens ${chalk.gray('(' + tokenVerdict + ')')}`);
+    if (analysis.loc.cocomo) {
+      lines.push(`  • Est. Dev Effort: ~${chalk.magenta.bold(analysis.loc.cocomo.effortMonths)} person-months ${chalk.gray(`(${analysis.loc.cocomo.formattedCost} est. value)`)}`);
+    }
     lines.push(chalk.gray('─'.repeat(54)));
   }
 

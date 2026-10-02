@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { countLines, shouldIgnore, estimateTokens, analyzeLoc } from '../src/locCounter.js';
+import { countLines, shouldIgnore, estimateTokens, analyzeLoc, estimateCocomo } from '../src/locCounter.js';
 
 describe('locCounter', () => {
   describe('shouldIgnore', () => {
@@ -72,6 +72,24 @@ function add(a, b) {
       expect(result.byLanguage['JavaScript']).toBeDefined();
       expect(result.byLanguage['JavaScript'].codeLines).toBe(2);
       expect(result.byLanguage['CSS'].codeLines).toBe(3);
+      expect(result.cocomo).toBeDefined();
+      expect(result.cocomo.effortMonths).toBeGreaterThan(0);
+    });
+  });
+
+  describe('estimateCocomo', () => {
+    it('should compute effort months and estimated development cost', () => {
+      const cocomo = estimateCocomo(10000);
+      expect(cocomo.effortMonths).toBeGreaterThan(0);
+      expect(cocomo.estimatedCost).toBeGreaterThan(0);
+      expect(cocomo.formattedCost).toContain('$');
+    });
+
+    it('should handle zero lines cleanly', () => {
+      const cocomo = estimateCocomo(0);
+      expect(cocomo.effortMonths).toBe(0);
+      expect(cocomo.estimatedCost).toBe(0);
+      expect(cocomo.formattedCost).toBe('$0');
     });
   });
 });

@@ -338,7 +338,7 @@
         <div>
           <div style="display:flex; align-items:center;">
             <h1 class="brand-title">Repo-Lens</h1>
-            <span class="brand-badge">v3.1.0</span>
+            <span class="brand-badge">v3.3.0</span>
           </div>
           <p style="font-size:0.82rem; color:var(--text-muted); margin-top:0.2rem;">Token-Free Repository Diagnostics & Architecture Studio</p>
         </div>
@@ -386,6 +386,11 @@
             <span class="stat-label">LLM Context Budget</span>
             <div class="stat-val" id="stat-tokens" style="color:#f59e0b;">0</div>
             <div class="stat-sub" id="stat-token-badge">Fits comfortably in 128k</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Est. Dev Effort (COCOMO)</span>
+            <div class="stat-val" id="stat-cocomo" style="color:#a855f7;">~0 mo</div>
+            <div class="stat-sub" id="stat-cocomo-cost">~$0 value (Organic)</div>
           </div>
           <div class="stat-card">
             <span class="stat-label">License & Security</span>
@@ -540,6 +545,11 @@
       const tokens = data.loc?.estimatedTokens || 0;
       document.getElementById('stat-tokens').textContent = '~' + tokens.toLocaleString();
       document.getElementById('stat-token-badge').textContent = tokens > 200000 ? '■ Large repo (Modular summary advised)' : '✓ Fits comfortably in 128k context';
+
+      if (data.loc?.cocomo) {
+        document.getElementById('stat-cocomo').textContent = `~${data.loc.cocomo.effortMonths} mo`;
+        document.getElementById('stat-cocomo-cost').textContent = `${data.loc.cocomo.formattedCost} est. value`;
+      }
 
       const lic = data.audit?.license?.spdxId || 'Unknown';
       const licElem = document.getElementById('stat-license');
@@ -718,6 +728,11 @@
       addRow('Source Code Lines (SLOC)', (data.repoA.loc?.totalCodeLines || 0).toLocaleString(), (data.repoB.loc?.totalCodeLines || 0).toLocaleString());
       addRow('Tracked File Count', (data.repoA.totalFiles || 0).toLocaleString(), (data.repoB.totalFiles || 0).toLocaleString());
       addRow('LLM Context Budget', '~' + (data.repoA.loc?.estimatedTokens || 0).toLocaleString(), '~' + (data.repoB.loc?.estimatedTokens || 0).toLocaleString());
+
+      const cocomoA = data.repoA.loc?.cocomo ? `~${data.repoA.loc.cocomo.effortMonths} mo (${data.repoA.loc.cocomo.formattedCost})` : 'N/A';
+      const cocomoB = data.repoB.loc?.cocomo ? `~${data.repoB.loc.cocomo.effortMonths} mo (${data.repoB.loc.cocomo.formattedCost})` : 'N/A';
+      addRow('Est. Dev Effort (COCOMO)', cocomoA, cocomoB);
+
       addRow('Frameworks', (data.repoA.stack?.frameworks || []).join(', ') || 'Standard', (data.repoB.stack?.frameworks || []).join(', ') || 'Standard');
       addRow('Monorepo Architecture', data.repoA.stack?.isMonorepo ? 'Yes' : 'No', data.repoB.stack?.isMonorepo ? 'Yes' : 'No');
       addRow('Open Source License', data.repoA.audit?.license?.spdxId || 'Unknown', data.repoB.audit?.license?.spdxId || 'Unknown');

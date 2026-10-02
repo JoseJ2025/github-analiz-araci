@@ -1,9 +1,9 @@
-# Repo-Lens (GitHub Repository Analyzer v3.0.0)
+# Repo-Lens (GitHub Repository Analyzer v3.3.0)
 
 A lightning-fast CLI diagnostic tool for analyzing GitHub repositories and local projects without using the GitHub API or tokens. Built for developers and AI coding agents.
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue)
-![Tests](https://img.shields.io/badge/tests-75%20passing-success)
+![Version](https://img.shields.io/badge/version-3.3.0-blue)
+![Tests](https://img.shields.io/badge/tests-82%20passing-success)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
 ![Speed](https://img.shields.io/badge/speed-%3C2s%20shallow%20scan-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -18,6 +18,7 @@ A lightning-fast CLI diagnostic tool for analyzing GitHub repositories and local
 - 🧩 **AI Architecture Skeleton (Markdown & XML)** — Extracts visual file trees, class hierarchies, and exported signatures into compact markdown or Claude-ready XML (`-f xml`).
 - ⚙️ **Tech-Stack & Framework DNA** — Auto-detects Next.js, React, Vue, FastAPI, Django, Gin, Axum, Tailwind, Docker, Vitest, and Monorepo setups.
 - 📊 **LOC & LLM Token Budget** — Counts physical lines of code (SLOC) and estimates context token load (~4 chars/token) for AI agents (Claude, Gemini, GPT).
+- 📈 **COCOMO Effort & Value Estimation** — Computes standard engineering person-months and estimated financial project valuation based on source code lines.
 - 🔒 **Deep Security, License & Secret Audit** — Identifies SPDX licenses, commercial use safety, accidentally committed secret files (`.env`, `.key`), AND regex-scans files for embedded API tokens (`ghp_`, `sk-`, `AKIA`).
 
 ## Installation

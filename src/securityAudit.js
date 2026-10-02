@@ -133,8 +133,11 @@ export function auditHygiene(files, readFile) {
       }
     }
 
-    // Content secret scan on non-binary/non-ignored files
+    // Content secret scan on non-binary/non-ignored/non-test files
     if (readFile && typeof readFile === 'function') {
+      if (file.startsWith('test/') || file.startsWith('tests/') || file.includes('__tests__') || file.includes('.test.') || file.includes('.spec.')) {
+        continue;
+      }
       const ext = file.split('.').pop().toLowerCase();
       const scannableExts = ['js', 'ts', 'jsx', 'tsx', 'json', 'py', 'go', 'rs', 'yaml', 'yml', 'env', 'txt', 'toml'];
       if (scannableExts.includes(ext) || file.startsWith('.env')) {

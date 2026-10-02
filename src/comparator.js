@@ -82,6 +82,10 @@ export function formatComparisonTable(a, b) {
   const tokensBStr = `~${(b.loc?.estimatedTokens || 0).toLocaleString()}`;
   table.push(['LLM Token Budget', tokensAStr, tokensBStr]);
 
+  const cocomoA = a.loc?.cocomo ? `~${a.loc.cocomo.effortMonths} mo (${a.loc.cocomo.formattedCost})` : 'N/A';
+  const cocomoB = b.loc?.cocomo ? `~${b.loc.cocomo.effortMonths} mo (${b.loc.cocomo.formattedCost})` : 'N/A';
+  table.push(['Dev Effort (COCOMO)', cocomoA, cocomoB]);
+
   // Stack & Monorepo
   const fwA = (a.stack?.frameworks || []).join(', ') || 'Standard';
   const fwB = (b.stack?.frameworks || []).join(', ') || 'Standard';

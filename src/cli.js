@@ -13,7 +13,7 @@ const program = new Command();
 program
   .name('gh-analyze')
   .description('Repo-Lens: Instant token-free GitHub repository & local project diagnostic for developers & AI agents')
-  .version('3.2.0');
+  .version('3.3.0');
 
 // Subcommand: ui
 program

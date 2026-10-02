@@ -1,10 +1,10 @@
 ﻿# MEMORY.md - Project Brain
 
 ## 🧠 Active Context
-- **Project:** Repo-Lens (GitHub Repo Analyzer v3.2.0)
+- **Project:** Repo-Lens (GitHub Repo Analyzer v3.3.0)
 - **Status:** ✅ COMPLETED & FULLY AUDITED
 - **Last Updated:** 2026-10-02
-- **Test Coverage:** 80/80 tests passing (100%)
+- **Test Coverage:** 82/82 tests passing (100%)
 
 ## 🏗️ Architecture Decision Records (ADR)
 
@@ -51,6 +51,14 @@
 - Native Node.js `http` module server serving a responsive, dark-mode dashboard.
 - REST endpoints: `/api/analyze`, `/api/compare`, `/api/skeleton`.
 - Interactive single diagnostic, head-to-head comparison table, and one-click AI prompt copy buttons.
+
+### [ADR-011] Shorthand URLs & XML AI Skeleton (v3.2.0)
+- Shorthand repo support (`owner/repo`).
+- Claude/Anthropic `<codebase>` XML export (`-f xml`).
+- In-content credential regex scanning (`ghp_`, `sk-`, `AKIA`, `xoxb-`).
+
+### [ADR-012] COCOMO Effort & Valuation Engine (v3.3.0)
+- Implements standard COCOMO Basic Organic Model for person-month effort and engineering project valuation.
 
 ## 📁 Project Structure
 

@@ -153,6 +153,31 @@ export function analyzeLoc(files, readFileContent) {
   }
 
   result.estimatedTokens = estimateTokens(result.totalChars);
+  result.cocomo = estimateCocomo(result.totalCodeLines);
 
   return result;
+}
+
+/**
+ * Calculates COCOMO-based effort and estimated development value
+ * Standard Organic Model: Effort = 2.4 * (KSLOC)^1.05
+ * @param {number} codeLines - Total physical source code lines
+ * @param {number} [averageMonthlySalary=4500] - USD
+ * @returns {{ effortMonths: number, scheduleMonths: number, estimatedCost: number, formattedCost: string }}
+ */
+export function estimateCocomo(codeLines, averageMonthlySalary = 4500) {
+  if (!codeLines || codeLines <= 0) {
+    return { effortMonths: 0, scheduleMonths: 0, estimatedCost: 0, formattedCost: '$0' };
+  }
+  const ksloc = codeLines / 1000;
+  const effortMonths = Math.max(0.1, Number((2.4 * Math.pow(ksloc, 1.05)).toFixed(1)));
+  const scheduleMonths = Math.max(0.1, Number((2.5 * Math.pow(effortMonths, 0.38)).toFixed(1)));
+  const estimatedCost = Math.round(effortMonths * averageMonthlySalary);
+
+  return {
+    effortMonths,
+    scheduleMonths,
+    estimatedCost,
+    formattedCost: `$${estimatedCost.toLocaleString()}`
+  };
 }
