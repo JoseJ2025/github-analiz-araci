@@ -10,7 +10,7 @@ const program = new Command();
 program
   .name('gh-analyze')
   .description('Repo-Lens: Instant token-free GitHub repository & local project diagnostic for developers & AI agents')
-  .version('2.1.0')
+  .version('2.2.0')
   .argument('<target>', 'GitHub repository URL or local directory path (.)')
   .option('-j, --json', 'Output as JSON')
   .option('-v, --verbose', 'Verbose output')

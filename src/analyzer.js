@@ -14,6 +14,7 @@ import { analyzeLanguages } from './language.js';
 import { analyzeLoc } from './locCounter.js';
 import { detectStack } from './stackDetector.js';
 import { runSecurityAudit } from './securityAudit.js';
+import { detectDevRecipe } from './runnability.js';
 
 /**
  * Analyze a GitHub repository or local directory
@@ -63,6 +64,7 @@ export async function analyzeRepo(parsedUrl, tempDir) {
     const loc = analyzeLoc(files, readFileSafely);
     const stack = detectStack(files, readFileSafely);
     const audit = runSecurityAudit(files, readFileSafely, lastCommit?.date);
+    const recipe = detectDevRecipe(files, readFileSafely);
 
     // Build result
     const result = {
@@ -76,7 +78,8 @@ export async function analyzeRepo(parsedUrl, tempDir) {
       languages,
       loc,
       stack,
-      audit
+      audit,
+      recipe
     };
 
     return result;

@@ -1,6 +1,6 @@
 {
   "name": "github-analiz-araci",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Repo-Lens: Instant token-free GitHub repository & local project diagnostic for developers & AI agents",
   "main": "src/cli.js",
   "type": "module",

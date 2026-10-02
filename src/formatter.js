@@ -53,6 +53,30 @@ export function formatAnalysis(analysis) {
     lines.push(chalk.gray('─'.repeat(54)));
   }
 
+  // Dev Recipe / Runnability
+  if (analysis.recipe && (analysis.recipe.runtime !== 'Unknown' || analysis.recipe.installCommand)) {
+    lines.push(chalk.bold.magenta('🚀 NASIL ÇALIŞTIRILIR? (DEV RECIPE)'));
+    if (analysis.recipe.runtime && analysis.recipe.runtime !== 'Unknown') {
+      lines.push(`  • Çalışma Zamanı: ${chalk.white(analysis.recipe.runtime)}`);
+    }
+    if (analysis.recipe.entrypoint) {
+      lines.push(`  • Giriş Noktası:  ${chalk.cyan(analysis.recipe.entrypoint)}`);
+    }
+    if (analysis.recipe.installCommand) {
+      lines.push(`  • Bağımlılıklar:  ${chalk.green(analysis.recipe.installCommand)}`);
+    }
+    if (analysis.recipe.devCommand) {
+      lines.push(`  • Geliştirme:     ${chalk.green(analysis.recipe.devCommand)}`);
+    }
+    if (analysis.recipe.buildCommand) {
+      lines.push(`  • Derleme:        ${chalk.green(analysis.recipe.buildCommand)}`);
+    }
+    if (analysis.recipe.testCommand) {
+      lines.push(`  • Test:           ${chalk.green(analysis.recipe.testCommand)}`);
+    }
+    lines.push(chalk.gray('─'.repeat(54)));
+  }
+
   // Security, License & Hygiene
   if (analysis.audit) {
     const lic = analysis.audit.license;
