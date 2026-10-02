@@ -15,14 +15,16 @@ import { analyzeLoc } from './locCounter.js';
 import { detectStack } from './stackDetector.js';
 import { runSecurityAudit } from './securityAudit.js';
 import { detectDevRecipe } from './runnability.js';
+import { generateSkeleton } from './skeleton.js';
 
 /**
  * Analyze a GitHub repository or local directory
  * @param {{isLocal?: boolean, owner?: string, repo: string, url: string, path?: string}} parsedUrl
  * @param {string} tempDir - Temporary directory for cloning (if remote)
+ * @param {Object} options - Analysis options (e.g. { skeleton: true })
  * @returns {Promise<Object>} - Analysis results
  */
-export async function analyzeRepo(parsedUrl, tempDir) {
+export async function analyzeRepo(parsedUrl, tempDir, options = {}) {
   let clonePath = null;
   const isLocal = Boolean(parsedUrl.isLocal);
 
@@ -66,6 +68,11 @@ export async function analyzeRepo(parsedUrl, tempDir) {
     const audit = runSecurityAudit(files, readFileSafely, lastCommit?.date);
     const recipe = detectDevRecipe(files, readFileSafely);
 
+    let skeleton = null;
+    if (options.skeleton) {
+      skeleton = generateSkeleton(`${parsedUrl.owner}/${parsedUrl.repo}`, files, readFileSafely);
+    }
+
     // Build result
     const result = {
       isLocal,
@@ -79,7 +86,8 @@ export async function analyzeRepo(parsedUrl, tempDir) {
       loc,
       stack,
       audit,
-      recipe
+      recipe,
+      skeleton
     };
 
     return result;

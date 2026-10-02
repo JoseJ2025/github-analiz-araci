@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { writeFileSync } from 'fs';
 import { Command } from 'commander';
 import { parseGitHubUrl } from './urlParser.js';
 import { analyzeRepo } from './analyzer.js';
@@ -11,7 +12,7 @@ const program = new Command();
 program
   .name('gh-analyze')
   .description('Repo-Lens: Instant token-free GitHub repository & local project diagnostic for developers & AI agents')
-  .version('2.3.0');
+  .version('3.0.0');
 
 // Subcommand: compare
 program
@@ -47,6 +48,8 @@ program
   .argument('[target]', 'GitHub repository URL or local directory path (.)')
   .option('-j, --json', 'Output as JSON')
   .option('-v, --verbose', 'Verbose output')
+  .option('-s, --skeleton', 'Export concise architectural skeleton (signatures & structure) for AI agents')
+  .option('-o, --output <file>', 'Save output to a specific file')
   .action(async (target, options) => {
     if (!target) {
       program.help();
@@ -60,12 +63,32 @@ program
         console.log(formatInfo(`Analyzing target: ${parsedUrl.repo}...`));
       }
 
-      const analysis = await analyzeRepo(parsedUrl);
+      const analysis = await analyzeRepo(parsedUrl, null, {
+        skeleton: Boolean(options.skeleton)
+      });
 
+      if (options.skeleton) {
+        if (options.output) {
+          writeFileSync(options.output, analysis.skeleton, 'utf-8');
+          console.log(formatSuccess(`Architectural skeleton saved to ${options.output}`));
+        } else {
+          console.log(analysis.skeleton);
+        }
+        return;
+      }
+
+      let outputContent = '';
       if (options.json) {
-        console.log(JSON.stringify(analysis, null, 2));
+        outputContent = JSON.stringify(analysis, null, 2);
       } else {
-        console.log(formatAnalysis(analysis));
+        outputContent = formatAnalysis(analysis);
+      }
+
+      if (options.output) {
+        writeFileSync(options.output, outputContent, 'utf-8');
+        console.log(formatSuccess(`Report saved to ${options.output}`));
+      } else {
+        console.log(outputContent);
       }
 
       if (options.verbose) {

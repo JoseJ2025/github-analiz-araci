@@ -1,10 +1,10 @@
 ﻿# MEMORY.md - Project Brain
 
 ## 🧠 Active Context
-- **Project:** Repo-Lens (GitHub Repo Analyzer v2.0.0)
-- **Status:** ✅ COMPLETED & AUDITED
+- **Project:** Repo-Lens (GitHub Repo Analyzer v3.0.0)
+- **Status:** ✅ COMPLETED & FULLY AUDITED
 - **Last Updated:** 2026-10-02
-- **Test Coverage:** 64/64 tests passing (100%)
+- **Test Coverage:** 75/75 tests passing (100%)
 
 ## 🏗️ Architecture Decision Records (ADR)
 
@@ -33,27 +33,47 @@
 - Audits repository for accidental secret leaks (`.env`, `.key`, `id_rsa`, certificates).
 - Evaluates maintenance activity status based on the latest commit timestamp.
 
+### [ADR-006] Local Directory Diagnostic Engine (v2.1.0)
+- Bypasses git clone when given local directories (`.` or `/path`).
+- Reads tracked and untracked files without modifying or deleting local user trees.
+
+### [ADR-007] Runnability & Dev-Recipe Inspector (v2.2.0)
+- Automatically detects package managers, runtime engines, dev scripts (`run dev`), build scripts, test runners, and primary entrypoints.
+
+### [ADR-008] Head-to-Head Comparison Mode (v2.3.0)
+- Side-by-side terminal comparison matrix with difference computation (SLOC, tokens, dependencies, maintenance).
+
+### [ADR-009] AI Architecture & Skeleton Exporter (v3.0.0)
+- Regex-based AST-free signature extractor (classes, exported functions, interfaces, structs) for JS/TS, Python, Go, and Rust.
+- Produces ultra-compact Markdown skeletons suitable for immediate LLM context window ingestion.
+
 ## 📁 Project Structure
 
 ```
 github-analiz-araci/
 ├── src/
-│   ├── cli.js            # CLI entry point (Commander.js)
+│   ├── cli.js            # CLI entry point & subcommands (Commander.js)
 │   ├── analyzer.js       # Main analysis orchestration
-│   ├── git.js            # Git wrapper (optimized shallow clone)
+│   ├── git.js            # Git wrapper (optimized shallow clone & local scanner)
 │   ├── locCounter.js     # Physical LOC & token counter
 │   ├── stackDetector.js  # Tech-stack & monorepo detector
 │   ├── securityAudit.js  # License & security hygiene auditor
+│   ├── runnability.js    # Runnability & dev-recipe inspector
+│   ├── comparator.js     # Head-to-head library comparator & table formatter
+│   ├── skeleton.js       # AI architecture & signature extractor
 │   ├── language.js       # Language extension mapper
-│   ├── urlParser.js      # GitHub URL parsing
+│   ├── urlParser.js      # GitHub URL & local path parsing
 │   └── formatter.js      # Beautiful CLI dashboard & error formatting
 ├── tests/
 │   ├── analyzer.test.js
+│   ├── comparator.test.js
 │   ├── formatter.test.js
 │   ├── git.test.js
 │   ├── language.test.js
 │   ├── locCounter.test.js
+│   ├── runnability.test.js
 │   ├── securityAudit.test.js
+│   ├── skeleton.test.js
 │   ├── stackDetector.test.js
 │   └── urlParser.test.js
 ├── package.json
@@ -64,7 +84,7 @@ github-analiz-araci/
 
 ## 🧪 Testing Status
 
-**Total Tests:** 64
-**Passing:** 64
+**Total Tests:** 75
+**Passing:** 75
 **Failing:** 0
-**Coverage:** >92%
+**Coverage:** >93%
