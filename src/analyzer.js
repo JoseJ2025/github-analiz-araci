@@ -70,7 +70,9 @@ export async function analyzeRepo(parsedUrl, tempDir, options = {}) {
 
     let skeleton = null;
     if (options.skeleton) {
-      skeleton = generateSkeleton(`${parsedUrl.owner}/${parsedUrl.repo}`, files, readFileSafely);
+      skeleton = generateSkeleton(`${parsedUrl.owner}/${parsedUrl.repo}`, files, readFileSafely, {
+        format: options.format || 'markdown'
+      });
     }
 
     // Build result

@@ -11,13 +11,14 @@ A lightning-fast CLI diagnostic tool for analyzing GitHub repositories and local
 ## ✨ Core Capabilities
 
 - ⚡ **Ultra-Fast Shallow & Treeless Clone** — Uses `--depth 1 --single-branch` to analyze even giant repositories in 2-4 seconds.
+- 🎯 **Shorthand Repo Names (`owner/repo`)** — No need to type full URLs; run `gh-analyze expressjs/express` directly.
 - 💻 **Local Directory Diagnostics (`gh-analyze .`)** — Instantly scan local directories and workspaces without cloning.
 - 🚀 **Runnability & Dev-Recipe Inspector** — Automatically detects runtime requirements, package managers, dev commands (`npm run dev`, `poetry run`, `cargo run`), test commands, and entrypoints.
 - ⚖️ **Side-by-Side Comparison (`gh-analyze compare`)** — Compare two libraries or projects head-to-head in an elegant terminal matrix table.
-- 🧩 **AI Architecture & Skeleton Exporter (`--skeleton`)** — Extracts visual file trees, class hierarchies, and exported function/interface signatures into compact markdown for LLM context injection without wasting tokens.
+- 🧩 **AI Architecture Skeleton (Markdown & XML)** — Extracts visual file trees, class hierarchies, and exported signatures into compact markdown or Claude-ready XML (`-f xml`).
 - ⚙️ **Tech-Stack & Framework DNA** — Auto-detects Next.js, React, Vue, FastAPI, Django, Gin, Axum, Tailwind, Docker, Vitest, and Monorepo setups.
 - 📊 **LOC & LLM Token Budget** — Counts physical lines of code (SLOC) and estimates context token load (~4 chars/token) for AI agents (Claude, Gemini, GPT).
-- 🔒 **Security & License Audit** — Identifies SPDX licenses (MIT, Apache, GPL, BSD), commercial use safety, accidentally committed secrets (`.env`, `.key`), and repository maintenance health.
+- 🔒 **Deep Security, License & Secret Audit** — Identifies SPDX licenses, commercial use safety, accidentally committed secret files (`.env`, `.key`), AND regex-scans files for embedded API tokens (`ghp_`, `sk-`, `AKIA`).
 
 ## Installation
 

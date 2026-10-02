@@ -13,7 +13,7 @@ const program = new Command();
 program
   .name('gh-analyze')
   .description('Repo-Lens: Instant token-free GitHub repository & local project diagnostic for developers & AI agents')
-  .version('3.1.0');
+  .version('3.2.0');
 
 // Subcommand: ui
 program
@@ -68,6 +68,7 @@ program
   .option('-j, --json', 'Output as JSON')
   .option('-v, --verbose', 'Verbose output')
   .option('-s, --skeleton', 'Export concise architectural skeleton (signatures & structure) for AI agents')
+  .option('-f, --format <format>', 'Skeleton output format: markdown or xml', 'markdown')
   .option('-o, --output <file>', 'Save output to a specific file')
   .action(async (target, options) => {
     if (!target) {
@@ -83,7 +84,8 @@ program
       }
 
       const analysis = await analyzeRepo(parsedUrl, null, {
-        skeleton: Boolean(options.skeleton)
+        skeleton: Boolean(options.skeleton),
+        format: options.format || 'markdown'
       });
 
       if (options.skeleton) {

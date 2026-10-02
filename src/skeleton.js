@@ -62,10 +62,41 @@ export function extractSignatures(filename, content) {
  * @param {string} repoName - Repository name (e.g. owner/repo)
  * @param {string[]} files - List of relative file paths
  * @param {Function} readFile - (path) => string
- * @returns {string} Markdown document
+ * @param {Object} [options] - Output formatting options ({ format: 'markdown' | 'xml' })
+ * @returns {string} Markdown or XML document
  */
-export function generateSkeleton(repoName, files, readFile) {
+export function generateSkeleton(repoName, files, readFile, options = {}) {
   const cleanFiles = files.filter(f => !shouldIgnore(f));
+
+  if (options.format === 'xml') {
+    const xml = [];
+    xml.push(`<codebase repository="${repoName}">`);
+    xml.push(`  <summary total_source_files="${cleanFiles.length}" />`);
+    xml.push('  <file_tree>');
+    for (const f of cleanFiles) {
+      xml.push(`    <file path="${f}" />`);
+    }
+    xml.push('  </file_tree>');
+    xml.push('  <signatures>');
+    for (const f of cleanFiles) {
+      const ext = f.split('.').pop().toLowerCase();
+      if (!['js', 'ts', 'jsx', 'tsx', 'py', 'go', 'rs'].includes(ext)) continue;
+      let content = '';
+      try { content = readFile(f) || ''; } catch { continue; }
+      const sigs = extractSignatures(f, content);
+      if (sigs.length > 0) {
+        xml.push(`    <file path="${f}">`);
+        for (const sig of sigs) {
+          xml.push(`      ${sig}`);
+        }
+        xml.push('    </file>');
+      }
+    }
+    xml.push('  </signatures>');
+    xml.push('</codebase>');
+    return xml.join('\n');
+  }
+
   const output = [];
 
   output.push(`# ARCHITECTURE SKELETON: ${repoName}`);

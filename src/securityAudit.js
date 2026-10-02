@@ -42,16 +42,24 @@ const LICENSE_PATTERNS = [
 ];
 
 const SENSITIVE_FILENAME_PATTERNS = [
-  /^\.env(\.|$)/i,
+  /^\.env/i,
   /\.pem$/i,
   /\.key$/i,
-  /\.p12$/i,
   /\.pfx$/i,
+  /\.p12$/i,
   /^id_rsa/i,
   /^id_ed25519/i,
   /^id_ecdsa/i,
   /service-account.*\.json$/i,
   /credentials.*\.json$/i
+];
+
+const SECRET_CONTENT_PATTERNS = [
+  { name: 'GitHub Personal Access Token', regex: /(?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36}/ },
+  { name: 'OpenAI API Key', regex: /sk-(?:proj-)?[a-zA-Z0-9_-]{32,}/ },
+  { name: 'AWS Access Key ID', regex: /AKIA[0-9A-Z]{16}/ },
+  { name: 'Private Key Block', regex: /-----BEGIN (?:RSA|EC|DSA|OPENSSH|PRIVATE) KEY-----/ },
+  { name: 'Slack Token', regex: /xox[baprs]-[0-9a-zA-Z]{10,48}/ }
 ];
 
 /**
@@ -109,10 +117,12 @@ export function detectLicense(files, readFile) {
 /**
  * Audits repository for accidentally committed secrets or sensitive files
  * @param {string[]} files - List of file paths
+ * @param {Function} [readFile] - Optional file reader for content secret scanning
  * @returns {Object} Hygiene report
  */
-export function auditHygiene(files) {
+export function auditHygiene(files, readFile) {
   const sensitiveFiles = [];
+  const exposedSecrets = [];
 
   for (const file of files) {
     const basename = file.split('/').pop();
@@ -122,11 +132,36 @@ export function auditHygiene(files) {
         break;
       }
     }
+
+    // Content secret scan on non-binary/non-ignored files
+    if (readFile && typeof readFile === 'function') {
+      const ext = file.split('.').pop().toLowerCase();
+      const scannableExts = ['js', 'ts', 'jsx', 'tsx', 'json', 'py', 'go', 'rs', 'yaml', 'yml', 'env', 'txt', 'toml'];
+      if (scannableExts.includes(ext) || file.startsWith('.env')) {
+        try {
+          const content = readFile(file);
+          if (content && typeof content === 'string') {
+            for (const sp of SECRET_CONTENT_PATTERNS) {
+              if (sp.regex.test(content)) {
+                exposedSecrets.push({
+                  file,
+                  type: sp.name
+                });
+                break;
+              }
+            }
+          }
+        } catch {
+          // Ignore unreadable
+        }
+      }
+    }
   }
 
   return {
-    hasIssues: sensitiveFiles.length > 0,
-    sensitiveFiles
+    hasIssues: sensitiveFiles.length > 0 || exposedSecrets.length > 0,
+    sensitiveFiles,
+    exposedSecrets
   };
 }
 
@@ -186,7 +221,7 @@ export function evaluateMaintenanceHealth(lastCommitDate) {
  */
 export function runSecurityAudit(files, readFile, lastCommitDate) {
   const license = detectLicense(files, readFile);
-  const hygiene = auditHygiene(files);
+  const hygiene = auditHygiene(files, readFile);
   const health = evaluateMaintenanceHealth(lastCommitDate);
 
   return {

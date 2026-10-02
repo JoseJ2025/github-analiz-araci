@@ -38,6 +38,11 @@ export function parseGitHubUrl(input) {
     .replace(/^https?:\/\/(www\.)?/, '')
     .replace(/\/$/, '');
 
+  // Handle shorthand owner/repo (e.g. 'expressjs/express')
+  if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) {
+    cleanedUrl = `github.com/${trimmed}`;
+  }
+
   // Check if it's a GitHub URL
   if (!cleanedUrl.startsWith('github.com/')) {
     throw new Error('Invalid URL: Must be a GitHub repository URL or valid local directory');

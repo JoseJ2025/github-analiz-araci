@@ -72,5 +72,15 @@ describe('urlParser', () => {
       expect(typeof result.repo).toBe('string');
       expect(result.url.startsWith('local://')).toBe(true);
     });
+
+    it('should parse shorthand owner/repo format', () => {
+      const result = parseGitHubUrl('expressjs/express');
+      expect(result).toEqual({
+        isLocal: false,
+        owner: 'expressjs',
+        repo: 'express',
+        url: 'https://github.com/expressjs/express.git'
+      });
+    });
   });
 });

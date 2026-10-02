@@ -54,6 +54,16 @@ describe('securityAudit', () => {
       expect(leaks.hasIssues).toBe(false);
       expect(leaks.sensitiveFiles.length).toBe(0);
     });
+
+    it('should detect in-content secrets when readFile is provided', () => {
+      const files = ['src/config.js'];
+      const readFile = () => 'const apiKey = "sk-proj-abcdef1234567890abcdef1234567890abcdef1234567890";';
+      const leaks = auditHygiene(files, readFile);
+
+      expect(leaks.hasIssues).toBe(true);
+      expect(leaks.exposedSecrets.length).toBe(1);
+      expect(leaks.exposedSecrets[0].type).toBe('OpenAI API Key');
+    });
   });
 
   describe('evaluateMaintenanceHealth', () => {

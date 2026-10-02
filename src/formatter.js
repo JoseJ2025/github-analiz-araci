@@ -84,7 +84,14 @@ export function formatAnalysis(analysis) {
     lines.push(`${chalk.bold('⚖️  License:')}        ${licColor(lic.spdxId)} ${chalk.gray(`(${lic.type})`)}`);
 
     if (analysis.audit.hygiene.hasIssues) {
-      lines.push(`${chalk.bold('⚠️  Hygiene Alert:')} ${chalk.red.bold(`Warning! Potentially exposed sensitive files: ${analysis.audit.hygiene.sensitiveFiles.join(', ')}`)}`);
+      const messages = [];
+      if (analysis.audit.hygiene.sensitiveFiles?.length > 0) {
+        messages.push(`Files: ${analysis.audit.hygiene.sensitiveFiles.join(', ')}`);
+      }
+      if (analysis.audit.hygiene.exposedSecrets?.length > 0) {
+        messages.push(`Credentials: ${analysis.audit.hygiene.exposedSecrets.map(s => `${s.type} in ${s.file}`).join(', ')}`);
+      }
+      lines.push(`${chalk.bold('⚠️  Hygiene Alert:')} ${chalk.red.bold(`Warning! ${messages.join(' | ')}`)}`);
     } else {
       lines.push(`${chalk.bold('🔒 Security:')}       ${chalk.green('Clean')} ${chalk.gray('(No sensitive credentials or keys exposed)')}`);
     }

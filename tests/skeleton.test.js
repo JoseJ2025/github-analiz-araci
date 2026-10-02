@@ -56,5 +56,22 @@ def connect_db(url: str) -> bool:
       expect(skeleton).toContain('def connect');
       expect(skeleton).not.toContain('node_modules');
     });
+
+    it('should generate XML formatted skeleton when format is xml', () => {
+      const mockFiles = ['src/user.ts', 'package.json'];
+      const fileContents = {
+        'src/user.ts': 'export function login() {}',
+        'package.json': '{"name": "demo"}'
+      };
+
+      const readFile = (p) => fileContents[p];
+      const skeletonXml = generateSkeleton('my-org/demo-repo', mockFiles, readFile, { format: 'xml' });
+
+      expect(skeletonXml).toContain('<codebase repository="my-org/demo-repo">');
+      expect(skeletonXml).toContain('<file_tree>');
+      expect(skeletonXml).toContain('<file path="src/user.ts" />');
+      expect(skeletonXml).toContain('export function login');
+      expect(skeletonXml).toContain('</codebase>');
+    });
   });
 });
