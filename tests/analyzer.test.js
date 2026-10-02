@@ -136,5 +136,34 @@ describe('analyzer', () => {
       await expect(analyzeRepo(mockUrl)).rejects.toThrow('Analysis failed');
       expect(gitUtils.cleanup).toHaveBeenCalledWith('/tmp/gh-analyze-abc123');
     });
+
+    it('should analyze local repository without cloning and without deleting local directory', async () => {
+      const mockLocalInput = {
+        isLocal: true,
+        owner: 'local',
+        repo: 'my-local-project',
+        path: '/home/user/my-local-project',
+        url: 'local:///home/user/my-local-project'
+      };
+
+      gitUtils.getLastCommit.mockResolvedValue({
+        hash: 'local123',
+        date: '2026-10-02T12:00:00Z',
+        message: 'Local work',
+        author: 'Local Dev'
+      });
+      gitUtils.getCommitCount.mockResolvedValue(5);
+      gitUtils.getRepoFiles.mockResolvedValue(['index.js']);
+      gitUtils.getDefaultBranch.mockResolvedValue('main');
+      analyzeLanguages.mockReturnValue([{ language: 'JavaScript', count: 1, percentage: 100 }]);
+
+      const result = await analyzeRepo(mockLocalInput);
+
+      expect(gitUtils.cloneRepo).not.toHaveBeenCalled();
+      expect(gitUtils.cleanup).not.toHaveBeenCalled();
+      expect(result.repository).toBe('local/my-local-project');
+      expect(result.url).toBe('local:///home/user/my-local-project');
+      expect(result.totalFiles).toBe(1);
+    });
   });
 });

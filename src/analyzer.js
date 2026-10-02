@@ -16,21 +16,26 @@ import { detectStack } from './stackDetector.js';
 import { runSecurityAudit } from './securityAudit.js';
 
 /**
- * Analyze a GitHub repository
- * @param {{owner: string, repo: string, url: string}} parsedUrl - Parsed GitHub URL
- * @param {string} tempDir - Temporary directory for cloning
+ * Analyze a GitHub repository or local directory
+ * @param {{isLocal?: boolean, owner?: string, repo: string, url: string, path?: string}} parsedUrl
+ * @param {string} tempDir - Temporary directory for cloning (if remote)
  * @returns {Promise<Object>} - Analysis results
  */
 export async function analyzeRepo(parsedUrl, tempDir) {
   let clonePath = null;
+  const isLocal = Boolean(parsedUrl.isLocal);
 
   try {
-    // Create temporary directory
-    const tempTemplate = join(tempDir || tmpdir(), 'gh-analyze-');
-    clonePath = await mkdtemp(tempTemplate);
+    if (isLocal) {
+      clonePath = parsedUrl.path;
+    } else {
+      // Create temporary directory
+      const tempTemplate = join(tempDir || tmpdir(), 'gh-analyze-');
+      clonePath = await mkdtemp(tempTemplate);
 
-    // Clone repository (shallow & single branch by default)
-    await cloneRepo(parsedUrl.url, clonePath);
+      // Clone repository (shallow & single branch by default)
+      await cloneRepo(parsedUrl.url, clonePath);
+    }
 
     // Gather information
     const [lastCommit, totalCommits, files, defaultBranch] = await Promise.all([
@@ -61,6 +66,7 @@ export async function analyzeRepo(parsedUrl, tempDir) {
 
     // Build result
     const result = {
+      isLocal,
       repository: `${parsedUrl.owner}/${parsedUrl.repo}`,
       url: parsedUrl.url.replace('.git', ''),
       defaultBranch,
@@ -75,8 +81,8 @@ export async function analyzeRepo(parsedUrl, tempDir) {
 
     return result;
   } finally {
-    // Always clean up, even on error
-    if (clonePath) {
+    // Only cleanup temporary clones, NEVER delete local user directory!
+    if (!isLocal && clonePath) {
       await cleanup(clonePath);
     }
   }

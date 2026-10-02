@@ -6,6 +6,7 @@ describe('urlParser', () => {
     it('should parse standard GitHub URL', () => {
       const result = parseGitHubUrl('https://github.com/owner/repo');
       expect(result).toEqual({
+        isLocal: false,
         owner: 'owner',
         repo: 'repo',
         url: 'https://github.com/owner/repo.git'
@@ -15,6 +16,7 @@ describe('urlParser', () => {
     it('should parse GitHub URL with www prefix', () => {
       const result = parseGitHubUrl('https://www.github.com/owner/repo');
       expect(result).toEqual({
+        isLocal: false,
         owner: 'owner',
         repo: 'repo',
         url: 'https://github.com/owner/repo.git'
@@ -24,6 +26,7 @@ describe('urlParser', () => {
     it('should parse GitHub URL without protocol', () => {
       const result = parseGitHubUrl('github.com/owner/repo');
       expect(result).toEqual({
+        isLocal: false,
         owner: 'owner',
         repo: 'repo',
         url: 'https://github.com/owner/repo.git'
@@ -33,6 +36,7 @@ describe('urlParser', () => {
     it('should parse GitHub URL with .git extension', () => {
       const result = parseGitHubUrl('https://github.com/owner/repo.git');
       expect(result).toEqual({
+        isLocal: false,
         owner: 'owner',
         repo: 'repo',
         url: 'https://github.com/owner/repo.git'
@@ -54,10 +58,19 @@ describe('urlParser', () => {
     it('should handle URL with trailing slash', () => {
       const result = parseGitHubUrl('https://github.com/owner/repo/');
       expect(result).toEqual({
+        isLocal: false,
         owner: 'owner',
         repo: 'repo',
         url: 'https://github.com/owner/repo.git'
       });
+    });
+
+    it('should detect local directory when given . or a valid path', () => {
+      const result = parseGitHubUrl('.');
+      expect(result.isLocal).toBe(true);
+      expect(typeof result.path).toBe('string');
+      expect(typeof result.repo).toBe('string');
+      expect(result.url.startsWith('local://')).toBe(true);
     });
   });
 });

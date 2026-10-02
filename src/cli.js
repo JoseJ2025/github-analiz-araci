@@ -9,9 +9,9 @@ const program = new Command();
 
 program
   .name('gh-analyze')
-  .description('Repo-Lens: Instant token-free GitHub repository diagnostic for developers & AI agents')
-  .version('2.0.0')
-  .argument('<url>', 'GitHub repository URL')
+  .description('Repo-Lens: Instant token-free GitHub repository & local project diagnostic for developers & AI agents')
+  .version('2.1.0')
+  .argument('<target>', 'GitHub repository URL or local directory path (.)')
   .option('-j, --json', 'Output as JSON')
   .option('-v, --verbose', 'Verbose output')
   .action(async (url, options) => {
