@@ -20,19 +20,19 @@ export function formatAnalysis(analysis) {
 
   // Last commit & health
   if (analysis.lastCommit) {
-    const commitDate = new Date(analysis.lastCommit.date).toLocaleDateString('tr-TR', {
+    const commitDate = new Date(analysis.lastCommit.date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
     const healthStatus = analysis.audit?.health?.status;
-    let healthBadge = chalk.green('● Aktif');
-    if (healthStatus === 'Stale') healthBadge = chalk.yellow('▲ Durgun');
-    if (healthStatus === 'Abandoned') healthBadge = chalk.red('■ Terk Edilmiş');
+    let healthBadge = chalk.green('● Active');
+    if (healthStatus === 'Stale') healthBadge = chalk.yellow('▲ Stale');
+    if (healthStatus === 'Abandoned') healthBadge = chalk.red('■ Abandoned');
 
-    lines.push(`${chalk.bold('📅 Son Aktivite:')}   ${chalk.white(commitDate)} (${healthBadge})`);
-    lines.push(`${chalk.bold('✍️  Yazar:')}          ${chalk.gray(analysis.lastCommit.author)}`);
-    lines.push(`${chalk.bold('💬 Son Commit:')}     ${chalk.gray(analysis.lastCommit.message.substring(0, 60))}${analysis.lastCommit.message.length > 60 ? '...' : ''}`);
+    lines.push(`${chalk.bold('📅 Last Activity:')}   ${chalk.white(commitDate)} (${healthBadge})`);
+    lines.push(`${chalk.bold('✍️  Author:')}          ${chalk.gray(analysis.lastCommit.author)}`);
+    lines.push(`${chalk.bold('💬 Latest Commit:')}  ${chalk.gray(analysis.lastCommit.message.substring(0, 60))}${analysis.lastCommit.message.length > 60 ? '...' : ''}`);
   }
 
   lines.push(chalk.gray('─'.repeat(54)));
@@ -41,35 +41,35 @@ export function formatAnalysis(analysis) {
   if (analysis.stack) {
     const fwList = analysis.stack.frameworks.length > 0
       ? analysis.stack.frameworks.map(f => chalk.bgBlue.black(` ${f} `)).join(' ')
-      : chalk.gray('Tespit Edilemedi');
+      : chalk.gray('None detected');
     const toolsList = analysis.stack.tools.length > 0
       ? analysis.stack.tools.map(t => chalk.bgGray.white(` ${t} `)).join(' ')
-      : chalk.gray('Standart');
-    const archType = analysis.stack.isMonorepo ? chalk.magenta.bold('Monorepo (Multi-package)') : chalk.gray('Tekil Uygulama (Standalone)');
+      : chalk.gray('Standard');
+    const archType = analysis.stack.isMonorepo ? chalk.magenta.bold('Monorepo (Multi-package)') : chalk.gray('Standalone Application');
 
     lines.push(`${chalk.bold('⚙️  Frameworks:')}    ${fwList}`);
     lines.push(`${chalk.bold('🛠️  Tools/DevOps:')}   ${toolsList}`);
-    lines.push(`${chalk.bold('🏗️  Mimari:')}         ${archType}`);
+    lines.push(`${chalk.bold('🏗️  Architecture:')}   ${archType}`);
     lines.push(chalk.gray('─'.repeat(54)));
   }
 
   // Dev Recipe / Runnability
   if (analysis.recipe && (analysis.recipe.runtime !== 'Unknown' || analysis.recipe.installCommand)) {
-    lines.push(chalk.bold.magenta('🚀 NASIL ÇALIŞTIRILIR? (DEV RECIPE)'));
+    lines.push(chalk.bold.magenta('🚀 RUNNABILITY & DEV RECIPE'));
     if (analysis.recipe.runtime && analysis.recipe.runtime !== 'Unknown') {
-      lines.push(`  • Çalışma Zamanı: ${chalk.white(analysis.recipe.runtime)}`);
+      lines.push(`  • Runtime:        ${chalk.white(analysis.recipe.runtime)}`);
     }
     if (analysis.recipe.entrypoint) {
-      lines.push(`  • Giriş Noktası:  ${chalk.cyan(analysis.recipe.entrypoint)}`);
+      lines.push(`  • Entrypoint:     ${chalk.cyan(analysis.recipe.entrypoint)}`);
     }
     if (analysis.recipe.installCommand) {
-      lines.push(`  • Bağımlılıklar:  ${chalk.green(analysis.recipe.installCommand)}`);
+      lines.push(`  • Dependencies:   ${chalk.green(analysis.recipe.installCommand)}`);
     }
     if (analysis.recipe.devCommand) {
-      lines.push(`  • Geliştirme:     ${chalk.green(analysis.recipe.devCommand)}`);
+      lines.push(`  • Development:    ${chalk.green(analysis.recipe.devCommand)}`);
     }
     if (analysis.recipe.buildCommand) {
-      lines.push(`  • Derleme:        ${chalk.green(analysis.recipe.buildCommand)}`);
+      lines.push(`  • Build:          ${chalk.green(analysis.recipe.buildCommand)}`);
     }
     if (analysis.recipe.testCommand) {
       lines.push(`  • Test:           ${chalk.green(analysis.recipe.testCommand)}`);
@@ -81,12 +81,12 @@ export function formatAnalysis(analysis) {
   if (analysis.audit) {
     const lic = analysis.audit.license;
     const licColor = lic.commercialUseAllowed ? chalk.green.bold : chalk.yellow.bold;
-    lines.push(`${chalk.bold('⚖️  Lisans:')}         ${licColor(lic.spdxId)} ${chalk.gray(`(${lic.type})`)}`);
+    lines.push(`${chalk.bold('⚖️  License:')}        ${licColor(lic.spdxId)} ${chalk.gray(`(${lic.type})`)}`);
 
     if (analysis.audit.hygiene.hasIssues) {
-      lines.push(`${chalk.bold('⚠️  Hijyen Uyarısı:')} ${chalk.red.bold(`Dikkat! Sızdırılmış olabilecek dosyalar: ${analysis.audit.hygiene.sensitiveFiles.join(', ')}`)}`);
+      lines.push(`${chalk.bold('⚠️  Hygiene Alert:')} ${chalk.red.bold(`Warning! Potentially exposed sensitive files: ${analysis.audit.hygiene.sensitiveFiles.join(', ')}`)}`);
     } else {
-      lines.push(`${chalk.bold('🔒 Güvenlik:')}       ${chalk.green('Temiz')} ${chalk.gray('(Açıkta hassas config/key dosyası bulunamadı)')}`);
+      lines.push(`${chalk.bold('🔒 Security:')}       ${chalk.green('Clean')} ${chalk.gray('(No sensitive credentials or keys exposed)')}`);
     }
     lines.push(chalk.gray('─'.repeat(54)));
   }
@@ -97,23 +97,23 @@ export function formatAnalysis(analysis) {
     const codeLines = analysis.loc.totalCodeLines.toLocaleString();
     const tokens = analysis.loc.estimatedTokens.toLocaleString();
 
-    let tokenVerdict = chalk.green('✓ 128k LLM bağlamına rahatlıkla sığar');
+    let tokenVerdict = chalk.green('✓ Comfortably fits within 128k LLM context');
     if (analysis.loc.estimatedTokens > 100000 && analysis.loc.estimatedTokens <= 200000) {
-      tokenVerdict = chalk.yellow('▲ 128k bütçesini zorlayabilir, 200k model önerilir');
+      tokenVerdict = chalk.yellow('▲ Tight for 128k, 200k model recommended');
     } else if (analysis.loc.estimatedTokens > 200000) {
-      tokenVerdict = chalk.red('■ Çok büyük repo — Parçalı/Modüler özetleme gerekir');
+      tokenVerdict = chalk.red('■ Large repository — Modular skeleton/summarization recommended');
     }
 
-    lines.push(`${chalk.bold('📊 Hacim & Bütçe:')}`);
-    lines.push(`  • Toplam Satır:   ${chalk.cyan(totalLines)} ${chalk.gray(`(Salt Kod: ${codeLines})`)}`);
-    lines.push(`  • Takip Edilen:   ${chalk.cyan(analysis.totalFiles.toLocaleString())} dosya`);
-    lines.push(`  • LLM Token Yükü: ~${chalk.yellow.bold(tokens)} token ${chalk.gray('(' + tokenVerdict + ')')}`);
+    lines.push(`${chalk.bold('📊 Code Scale & LLM Budget:')}`);
+    lines.push(`  • Total Lines:    ${chalk.cyan(totalLines)} ${chalk.gray(`(Source Code: ${codeLines})`)}`);
+    lines.push(`  • Tracked Files:  ${chalk.cyan(analysis.totalFiles.toLocaleString())} files`);
+    lines.push(`  • LLM Context:    ~${chalk.yellow.bold(tokens)} tokens ${chalk.gray('(' + tokenVerdict + ')')}`);
     lines.push(chalk.gray('─'.repeat(54)));
   }
 
   // Language Distribution
   if (analysis.languages && analysis.languages.length > 0) {
-    lines.push(chalk.bold('🔤 Dil Dağılımı:'));
+    lines.push(chalk.bold('🔤 Language Breakdown:'));
 
     const maxCount = analysis.languages[0].count;
 
@@ -125,7 +125,7 @@ export function formatAnalysis(analysis) {
       lines.push(`  ${chalk.cyan(lang.language.padEnd(14))} ${chalk.green(bar)} ${percentage}%`);
     }
   } else {
-    lines.push(chalk.yellow('  Programlama dili tespit edilemedi'));
+    lines.push(chalk.yellow('  No programming languages detected'));
   }
 
   lines.push(chalk.gray('━'.repeat(54)));
@@ -140,7 +140,7 @@ export function formatAnalysis(analysis) {
  * @returns {string} - Formatted error
  */
 export function formatError(message) {
-  return chalk.red(`✖ Hata: ${message}`);
+  return chalk.red(`✖ Error: ${message}`);
 }
 
 /**

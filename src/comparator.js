@@ -61,7 +61,7 @@ export function formatComparisonTable(a, b) {
 
   const table = new Table({
     head: [
-      chalk.white.bold('Boyut / Metrik'),
+      chalk.white.bold('Dimension / Metric'),
       chalk.cyan.bold(a.repository),
       chalk.yellow.bold(b.repository)
     ],
@@ -70,35 +70,35 @@ export function formatComparisonTable(a, b) {
   });
 
   // Scale / Code
-  const slocAStr = `${(a.loc?.totalCodeLines || 0).toLocaleString()} satır`;
-  const slocBStr = `${(b.loc?.totalCodeLines || 0).toLocaleString()} satır`;
-  table.push(['Kod Satırı (SLOC)', slocAStr, slocBStr]);
+  const slocAStr = `${(a.loc?.totalCodeLines || 0).toLocaleString()} lines`;
+  const slocBStr = `${(b.loc?.totalCodeLines || 0).toLocaleString()} lines`;
+  table.push(['Source Lines (SLOC)', slocAStr, slocBStr]);
 
-  const filesAStr = `${(a.totalFiles || 0).toLocaleString()} dosya`;
-  const filesBStr = `${(b.totalFiles || 0).toLocaleString()} dosya`;
-  table.push(['Dosya Sayısı', filesAStr, filesBStr]);
+  const filesAStr = `${(a.totalFiles || 0).toLocaleString()} files`;
+  const filesBStr = `${(b.totalFiles || 0).toLocaleString()} files`;
+  table.push(['File Count', filesAStr, filesBStr]);
 
   const tokensAStr = `~${(a.loc?.estimatedTokens || 0).toLocaleString()}`;
   const tokensBStr = `~${(b.loc?.estimatedTokens || 0).toLocaleString()}`;
-  table.push(['LLM Token Bütçesi', tokensAStr, tokensBStr]);
+  table.push(['LLM Token Budget', tokensAStr, tokensBStr]);
 
   // Stack & Monorepo
-  const fwA = (a.stack?.frameworks || []).join(', ') || 'Standart';
-  const fwB = (b.stack?.frameworks || []).join(', ') || 'Standart';
+  const fwA = (a.stack?.frameworks || []).join(', ') || 'Standard';
+  const fwB = (b.stack?.frameworks || []).join(', ') || 'Standard';
   table.push(['Frameworks', fwA, fwB]);
 
-  const monoA = a.stack?.isMonorepo ? 'Evet (Monorepo)' : 'Hayır (Tekil)';
-  const monoB = b.stack?.isMonorepo ? 'Evet (Monorepo)' : 'Hayır (Tekil)';
+  const monoA = a.stack?.isMonorepo ? 'Yes (Monorepo)' : 'No (Standalone)';
+  const monoB = b.stack?.isMonorepo ? 'Yes (Monorepo)' : 'No (Standalone)';
   table.push(['Monorepo', monoA, monoB]);
 
   // Governance & Health
-  const licA = a.audit?.license?.spdxId || 'Bilinmiyor';
-  const licB = b.audit?.license?.spdxId || 'Bilinmiyor';
-  table.push(['Lisans', licA, licB]);
+  const licA = a.audit?.license?.spdxId || 'Unknown';
+  const licB = b.audit?.license?.spdxId || 'Unknown';
+  table.push(['License', licA, licB]);
 
   const healthA = a.audit?.health?.status || 'Unknown';
   const healthB = b.audit?.health?.status || 'Unknown';
-  table.push(['Bakım Durumu', healthA, healthB]);
+  table.push(['Maintenance Health', healthA, healthB]);
 
   lines.push(table.toString());
 
@@ -108,9 +108,9 @@ export function formatComparisonTable(a, b) {
     const winner = diff.smallerRepo;
     const loser = winner === a.repository ? b.repository : a.repository;
     const savedLines = Math.abs(diff.slocDiff).toLocaleString();
-    lines.push(chalk.green.bold(`💡 Karar Özeti: ${chalk.underline(winner)}, ${loser} projesine kıyasla ${savedLines} satır daha hafif.`));
+    lines.push(chalk.green.bold(`💡 Verdict: ${chalk.underline(winner)} is ${savedLines} lines leaner than ${loser}.`));
   } else {
-    lines.push(chalk.cyan('💡 Karar Özeti: İki repo benzer kod hacmine sahip.'));
+    lines.push(chalk.cyan('💡 Verdict: Both repositories have comparable code scale.'));
   }
   lines.push(chalk.gray('━'.repeat(66)));
   lines.push('');
