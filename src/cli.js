@@ -9,8 +9,8 @@ const program = new Command();
 
 program
   .name('gh-analyze')
-  .description('GitHub Repository Analyzer - Analyze GitHub repos without API')
-  .version('1.0.0')
+  .description('Repo-Lens: Instant token-free GitHub repository diagnostic for developers & AI agents')
+  .version('2.0.0')
   .argument('<url>', 'GitHub repository URL')
   .option('-j, --json', 'Output as JSON')
   .option('-v, --verbose', 'Verbose output')

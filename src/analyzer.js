@@ -1,4 +1,5 @@
 import { mkdtemp } from 'fs/promises';
+import { readFileSync, existsSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import {
@@ -10,6 +11,9 @@ import {
   getDefaultBranch
 } from './git.js';
 import { analyzeLanguages } from './language.js';
+import { analyzeLoc } from './locCounter.js';
+import { detectStack } from './stackDetector.js';
+import { runSecurityAudit } from './securityAudit.js';
 
 /**
  * Analyze a GitHub repository
@@ -25,7 +29,7 @@ export async function analyzeRepo(parsedUrl, tempDir) {
     const tempTemplate = join(tempDir || tmpdir(), 'gh-analyze-');
     clonePath = await mkdtemp(tempTemplate);
 
-    // Clone repository
+    // Clone repository (shallow & single branch by default)
     await cloneRepo(parsedUrl.url, clonePath);
 
     // Gather information
@@ -36,8 +40,24 @@ export async function analyzeRepo(parsedUrl, tempDir) {
       getDefaultBranch(clonePath)
     ]);
 
-    // Analyze languages
+    // Safe file reader bound to clonePath
+    const readFileSafely = (relPath) => {
+      try {
+        const fullPath = join(clonePath, relPath);
+        if (existsSync(fullPath)) {
+          return readFileSync(fullPath, 'utf-8');
+        }
+      } catch {
+        return '';
+      }
+      return '';
+    };
+
+    // Analyze languages, LOC/tokens, tech stack and security
     const languages = analyzeLanguages(files);
+    const loc = analyzeLoc(files, readFileSafely);
+    const stack = detectStack(files, readFileSafely);
+    const audit = runSecurityAudit(files, readFileSafely, lastCommit?.date);
 
     // Build result
     const result = {
@@ -47,7 +67,10 @@ export async function analyzeRepo(parsedUrl, tempDir) {
       lastCommit,
       totalCommits,
       totalFiles: files.length,
-      languages
+      languages,
+      loc,
+      stack,
+      audit
     };
 
     return result;

@@ -21,7 +21,8 @@ vi.mock('../src/git.js', () => ({
 }));
 
 vi.mock('../src/language.js', () => ({
-  analyzeLanguages: vi.fn()
+  analyzeLanguages: vi.fn(),
+  detectLanguage: vi.fn(() => 'JavaScript')
 }));
 
 import { mkdtemp } from 'fs/promises';

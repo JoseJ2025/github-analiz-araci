@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import Table from 'cli-table3';
 
 /**
  * Format analysis results for console output
@@ -11,53 +10,101 @@ export function formatAnalysis(analysis) {
 
   // Header
   lines.push('');
-  lines.push(chalk.bold.blue('📊 GitHub Repository Analysis'));
-  lines.push(chalk.gray('━'.repeat(50)));
-  lines.push('');
+  lines.push(chalk.bold.cyan('🔭 REPO LENS — Repository Diagnostic Report'));
+  lines.push(chalk.gray('━'.repeat(54)));
 
-  // Repository info
-  lines.push(chalk.bold('📁 Repository:') + ` ${chalk.cyan(analysis.repository)}`);
-  lines.push(chalk.bold('🌐 URL:') + ` ${chalk.gray(analysis.url)}`);
-  lines.push(chalk.bold('🌿 Branch:') + ` ${chalk.yellow(analysis.defaultBranch)}`);
+  // Core Identity
+  lines.push(`${chalk.bold('📁 Repository:')}   ${chalk.white.bold(analysis.repository)}`);
+  lines.push(`${chalk.bold('🌐 URL:')}          ${chalk.gray(analysis.url)}`);
+  lines.push(`${chalk.bold('🌿 Default Branch:')} ${chalk.yellow(analysis.defaultBranch || 'unknown')}`);
 
-  // Last commit
+  // Last commit & health
   if (analysis.lastCommit) {
-    const date = new Date(analysis.lastCommit.date).toLocaleString();
-    lines.push(chalk.bold('📅 Last Commit:') + ` ${chalk.gray(date)}`);
-    lines.push(chalk.bold('✍️  Author:') + ` ${chalk.white(analysis.lastCommit.author)}`);
-    lines.push(chalk.bold('💬 Message:') + ` ${chalk.white(analysis.lastCommit.message.substring(0, 60))}${analysis.lastCommit.message.length > 60 ? '...' : ''}`);
-  } else {
-    lines.push(chalk.bold('📅 Last Commit:') + ` ${chalk.red('No commits')}`);
+    const commitDate = new Date(analysis.lastCommit.date).toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    const healthStatus = analysis.audit?.health?.status;
+    let healthBadge = chalk.green('● Aktif');
+    if (healthStatus === 'Stale') healthBadge = chalk.yellow('▲ Durgun');
+    if (healthStatus === 'Abandoned') healthBadge = chalk.red('■ Terk Edilmiş');
+
+    lines.push(`${chalk.bold('📅 Son Aktivite:')}   ${chalk.white(commitDate)} (${healthBadge})`);
+    lines.push(`${chalk.bold('✍️  Yazar:')}          ${chalk.gray(analysis.lastCommit.author)}`);
+    lines.push(`${chalk.bold('💬 Son Commit:')}     ${chalk.gray(analysis.lastCommit.message.substring(0, 60))}${analysis.lastCommit.message.length > 60 ? '...' : ''}`);
   }
 
-  lines.push('');
+  lines.push(chalk.gray('─'.repeat(54)));
 
-  // Statistics
-  lines.push(chalk.bold('📊 Statistics:'));
-  lines.push(`  • Total Files: ${chalk.cyan(analysis.totalFiles.toLocaleString())}`);
-  lines.push(`  • Total Commits: ${chalk.cyan(analysis.totalCommits.toLocaleString())}`);
+  // Tech Stack & Architecture
+  if (analysis.stack) {
+    const fwList = analysis.stack.frameworks.length > 0
+      ? analysis.stack.frameworks.map(f => chalk.bgBlue.black(` ${f} `)).join(' ')
+      : chalk.gray('Tespit Edilemedi');
+    const toolsList = analysis.stack.tools.length > 0
+      ? analysis.stack.tools.map(t => chalk.bgGray.white(` ${t} `)).join(' ')
+      : chalk.gray('Standart');
+    const archType = analysis.stack.isMonorepo ? chalk.magenta.bold('Monorepo (Multi-package)') : chalk.gray('Tekil Uygulama (Standalone)');
 
-  lines.push('');
+    lines.push(`${chalk.bold('⚙️  Frameworks:')}    ${fwList}`);
+    lines.push(`${chalk.bold('🛠️  Tools/DevOps:')}   ${toolsList}`);
+    lines.push(`${chalk.bold('🏗️  Mimari:')}         ${archType}`);
+    lines.push(chalk.gray('─'.repeat(54)));
+  }
 
-  // Language distribution
-  if (analysis.languages.length > 0) {
-    lines.push(chalk.bold('🔤 Language Distribution:'));
+  // Security, License & Hygiene
+  if (analysis.audit) {
+    const lic = analysis.audit.license;
+    const licColor = lic.commercialUseAllowed ? chalk.green.bold : chalk.yellow.bold;
+    lines.push(`${chalk.bold('⚖️  Lisans:')}         ${licColor(lic.spdxId)} ${chalk.gray(`(${lic.type})`)}`);
+
+    if (analysis.audit.hygiene.hasIssues) {
+      lines.push(`${chalk.bold('⚠️  Hijyen Uyarısı:')} ${chalk.red.bold(`Dikkat! Sızdırılmış olabilecek dosyalar: ${analysis.audit.hygiene.sensitiveFiles.join(', ')}`)}`);
+    } else {
+      lines.push(`${chalk.bold('🔒 Güvenlik:')}       ${chalk.green('Temiz')} ${chalk.gray('(Açıkta hassas config/key dosyası bulunamadı)')}`);
+    }
+    lines.push(chalk.gray('─'.repeat(54)));
+  }
+
+  // Scale & LLM Context Budget
+  if (analysis.loc) {
+    const totalLines = analysis.loc.totalLines.toLocaleString();
+    const codeLines = analysis.loc.totalCodeLines.toLocaleString();
+    const tokens = analysis.loc.estimatedTokens.toLocaleString();
+
+    let tokenVerdict = chalk.green('✓ 128k LLM bağlamına rahatlıkla sığar');
+    if (analysis.loc.estimatedTokens > 100000 && analysis.loc.estimatedTokens <= 200000) {
+      tokenVerdict = chalk.yellow('▲ 128k bütçesini zorlayabilir, 200k model önerilir');
+    } else if (analysis.loc.estimatedTokens > 200000) {
+      tokenVerdict = chalk.red('■ Çok büyük repo — Parçalı/Modüler özetleme gerekir');
+    }
+
+    lines.push(`${chalk.bold('📊 Hacim & Bütçe:')}`);
+    lines.push(`  • Toplam Satır:   ${chalk.cyan(totalLines)} ${chalk.gray(`(Salt Kod: ${codeLines})`)}`);
+    lines.push(`  • Takip Edilen:   ${chalk.cyan(analysis.totalFiles.toLocaleString())} dosya`);
+    lines.push(`  • LLM Token Yükü: ~${chalk.yellow.bold(tokens)} token ${chalk.gray('(' + tokenVerdict + ')')}`);
+    lines.push(chalk.gray('─'.repeat(54)));
+  }
+
+  // Language Distribution
+  if (analysis.languages && analysis.languages.length > 0) {
+    lines.push(chalk.bold('🔤 Dil Dağılımı:'));
 
     const maxCount = analysis.languages[0].count;
 
-    for (const lang of analysis.languages) {
-      const barLength = Math.round((lang.count / maxCount) * 20);
+    for (const lang of analysis.languages.slice(0, 8)) {
+      const barLength = Math.max(1, Math.round((lang.count / maxCount) * 20));
       const bar = '█'.repeat(barLength) + '░'.repeat(20 - barLength);
       const percentage = lang.percentage.toFixed(1).padStart(5);
 
-      lines.push(`  ${chalk.cyan(lang.language.padEnd(12))} ${chalk.green(bar)} ${percentage}%`);
+      lines.push(`  ${chalk.cyan(lang.language.padEnd(14))} ${chalk.green(bar)} ${percentage}%`);
     }
   } else {
-    lines.push(chalk.yellow('  No programming languages detected'));
+    lines.push(chalk.yellow('  Programlama dili tespit edilemedi'));
   }
 
-  lines.push('');
-  lines.push(chalk.gray('━'.repeat(50)));
+  lines.push(chalk.gray('━'.repeat(54)));
   lines.push('');
 
   return lines.join('\n');
@@ -69,7 +116,7 @@ export function formatAnalysis(analysis) {
  * @returns {string} - Formatted error
  */
 export function formatError(message) {
-  return chalk.red(`✖ Error: ${message}`);
+  return chalk.red(`✖ Hata: ${message}`);
 }
 
 /**
