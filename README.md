@@ -1,19 +1,19 @@
-# GitHub Repo Analyzer
+# Repo-Lens (GitHub Repository Analyzer v2.0.0)
 
-A CLI tool for analyzing GitHub repositories without using the GitHub API.
+A lightning-fast CLI diagnostic tool for analyzing GitHub repositories without using the GitHub API or tokens. Built for developers and AI agents.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Tests](https://img.shields.io/badge/tests-42%20passing-success)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![Tests](https://img.shields.io/badge/tests-64%20passing-success)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
+![Speed](https://img.shields.io/badge/clone-shallow%20%26%20treeless-orange)
 
-## Features
+## ✨ New in v2.0.0 (Repo-Lens)
 
-- 🔍 **No API Required** - Analyze repositories using git commands only
-- 📊 **Language Distribution** - Visual breakdown of programming languages
-- 📅 **Commit History** - Last commit date, author, and message
-- 📈 **Statistics** - Total files, commits, and default branch
-- 🎨 **Beautiful Output** - Colored terminal output with visual bars
-- 📄 **JSON Export** - Export results as JSON for further processing
+- ⚡ **Ultra-Fast Shallow & Treeless Clone** — Uses `--depth 1 --single-branch` to analyze even giant repositories in 2-4 seconds.
+- ⚙️ **Tech-Stack & Framework DNA** — Auto-detects Next.js, React, Vue, FastAPI, Django, Gin, Axum, Tailwind, Docker, and Monorepo setups.
+- 📊 **LOC & LLM Token Budget** — Counts physical lines of code (SLOC) and estimates context token load (~4 chars/token) for AI agents (Claude, Gemini, GPT).
+- 🔒 **Security & License Audit** — Identifies SPDX licenses (MIT, Apache, GPL, BSD), commercial use safety, accidentally committed secrets (`.env`, `.key`), and repository maintenance health.
+- 🎨 **Redesigned Terminal UI & JSON Output** — Clean dashboard view for terminal users and structured schema for AI agent pipelines (`--json`).
 
 ## Installation
 
@@ -43,125 +43,42 @@ node src/cli.js <url>
 ### Basic Usage
 
 ```bash
-gh-analyze https://github.com/nodejs/node
+gh-analyze https://github.com/facebook/react
 ```
 
 ### Output Options
 
 ```bash
-# JSON output
-gh-analyze https://github.com/facebook/react --json
+# JSON output (ideal for AI agents & CI pipelines)
+gh-analyze https://github.com/vercel/next.js --json
 
 # Verbose mode
-gh-analyze https://github.com/vercel/next.js --verbose
+gh-analyze https://github.com/cli/cli --verbose
 
 # Short URL format
-gh-analyze github.com/cli/cli
+gh-analyze github.com/fastapi/fastapi
 ```
-
-### Example Output
-
-```
-📊 GitHub Repository Analysis
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📁 Repository: cli/cli
-🌐 URL: https://github.com/cli/cli
-🌿 Branch: trunk
-📅 Last Commit: 1/8/2026, 1:11:36 AM
-✍️  Author: Babak K. Shandiz
-💬 Message: Merge pull request #12440 from cli/babakks/enable-noop-linte...
-
-📊 Statistics:
-  • Total Files: 1,316
-  • Total Commits: 10,656
-
-🔤 Language Distribution:
-  Go           ████████████████████  83.3%
-  JSON         ██░░░░░░░░░░░░░░░░░░   7.3%
-  Markdown     █░░░░░░░░░░░░░░░░░░░   4.6%
-  YAML         █░░░░░░░░░░░░░░░░░░░   2.6%
-  Shell        ░░░░░░░░░░░░░░░░░░░░   1.8%
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-## Supported Languages
-
-The tool detects 20+ programming languages including:
-
-- JavaScript / TypeScript
-- Python, Go, Rust
-- Java, C, C++, C#
-- Ruby, PHP, Swift
-- HTML, CSS, JSON
-- Markdown, YAML, TOML
-- And more...
-
-## How It Works
-
-1. **Clone** - Temporarily clones the repository to a temp directory
-2. **Analyze** - Uses git commands to extract:
-   - Commit history and statistics
-   - File list and extensions
-   - Default branch name
-3. **Detect** - Analyzes file extensions to determine language distribution
-4. **Display** - Formats and displays results in your terminal
-5. **Cleanup** - Automatically removes temporary files
 
 ## Requirements
 
 - **Node.js** >= 18.0.0
 - **Git** - Must be installed and available in PATH
-- **Network** - Required for cloning public repositories
+- **Network** - Required for shallow cloning public repositories
 
 ## Development
 
-### Running Tests
-
 ```bash
-# Run all tests
+# Run all 64 tests
 npm test
 
-# Run with coverage
+# Run tests with coverage
 npm run test:coverage
 ```
 
-### Project Structure
-
-```
-github-analiz-araci/
-├── src/
-│   ├── cli.js          # CLI entry point
-│   ├── analyzer.js     # Main analysis logic
-│   ├── git.js          # Git operations wrapper
-│   ├── language.js     # Language detection
-│   ├── urlParser.js    # GitHub URL parsing
-│   └── formatter.js    # Output formatting
-├── tests/              # Test files
-├── SPEC.md             # Technical specification
-├── MEMORY.md           # Architecture decisions
-└── STYLE.md            # Coding standards
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## License
 
-MIT License - feel free to use this tool for any purpose.
+MIT License — feel free to use this tool for any purpose.
 
 ## Author
 
 Created by [JoseJ2025](https://github.com/JoseJ2025)
-
-## Acknowledgments
-
-- Built with [simple-git](https://www.npmjs.com/package/simple-git)
-- CLI framework by [Commander.js](https://www.npmjs.com/package/commander)
-- Testing with [Vitest](https://vitest.dev/)
-
----
-
-**Note:** This tool works with public GitHub repositories only. Private repositories require authentication which is intentionally not supported to keep the tool simple and API-free.
