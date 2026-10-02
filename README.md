@@ -4,7 +4,7 @@ A lightning-fast CLI diagnostic tool for analyzing GitHub repositories and local
 
 ![Version](https://img.shields.io/badge/version-3.3.0-blue)
 ![Tests](https://img.shields.io/badge/tests-82%20passing-success)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
+![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green)
 ![Speed](https://img.shields.io/badge/speed-%3C2s%20shallow%20scan-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
