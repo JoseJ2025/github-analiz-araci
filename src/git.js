@@ -8,10 +8,10 @@ import { join } from 'path';
  * @param {string} targetPath - Target directory path
  * @returns {Promise<string>} - Path to cloned repository
  */
-export async function cloneRepo(url, targetPath) {
+export async function cloneRepo(url, targetPath, options = ['--depth', '1', '--single-branch']) {
   try {
     const git = simpleGit();
-    await git.clone(url, targetPath);
+    await git.clone(url, targetPath, options);
     return targetPath;
   } catch (error) {
     throw new Error(`Failed to clone repository: ${error.message}`);

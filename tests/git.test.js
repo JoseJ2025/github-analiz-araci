@@ -36,7 +36,25 @@ describe('git', () => {
 
       expect(mockGit.clone).toHaveBeenCalledWith(
         'https://github.com/owner/repo.git',
-        '/tmp/test'
+        '/tmp/test',
+        ['--depth', '1', '--single-branch']
+      );
+      expect(result).toBe('/tmp/test');
+    });
+
+    it('should clone repository with custom options if provided', async () => {
+      const mockGit = {
+        clone: vi.fn().mockResolvedValue(undefined)
+      };
+      simpleGit.mockReturnValue(mockGit);
+
+      const customOptions = ['--depth', '10'];
+      const result = await cloneRepo('https://github.com/owner/repo.git', '/tmp/test', customOptions);
+
+      expect(mockGit.clone).toHaveBeenCalledWith(
+        'https://github.com/owner/repo.git',
+        '/tmp/test',
+        customOptions
       );
       expect(result).toBe('/tmp/test');
     });
