@@ -47,6 +47,11 @@
 - Regex-based AST-free signature extractor (classes, exported functions, interfaces, structs) for JS/TS, Python, Go, and Rust.
 - Produces ultra-compact Markdown skeletons suitable for immediate LLM context window ingestion.
 
+### [ADR-010] Zero-Dependency Local Web Studio UI (v3.1.0)
+- Native Node.js `http` module server serving a responsive, dark-mode dashboard.
+- REST endpoints: `/api/analyze`, `/api/compare`, `/api/skeleton`.
+- Interactive single diagnostic, head-to-head comparison table, and one-click AI prompt copy buttons.
+
 ## 📁 Project Structure
 
 ```

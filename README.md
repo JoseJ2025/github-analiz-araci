@@ -50,7 +50,16 @@ node src/cli.js <target>
 gh-analyze https://github.com/facebook/react
 ```
 
-### 2. Local Directory Scan
+### 2. Interactive Web Dashboard (Studio UI)
+
+Launch the self-contained, dark-mode visual web dashboard:
+
+```bash
+gh-analyze ui
+# Or specify a port: gh-analyze ui 3000
+```
+
+### 3. Local Directory Scan
 
 ```bash
 cd my-project

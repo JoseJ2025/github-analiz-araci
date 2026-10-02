@@ -6,13 +6,32 @@ import { parseGitHubUrl } from './urlParser.js';
 import { analyzeRepo } from './analyzer.js';
 import { formatAnalysis, formatError, formatInfo, formatSuccess } from './formatter.js';
 import { compareAnalyses, formatComparisonTable } from './comparator.js';
+import { startServer } from './server.js';
 
 const program = new Command();
 
 program
   .name('gh-analyze')
   .description('Repo-Lens: Instant token-free GitHub repository & local project diagnostic for developers & AI agents')
-  .version('3.0.0');
+  .version('3.1.0');
+
+// Subcommand: ui
+program
+  .command('ui')
+  .description('Launch interactive local web dashboard')
+  .argument('[port]', 'Port to listen on (default: 3000)', '3000')
+  .action(async (port) => {
+    try {
+      const portNum = parseInt(port, 10) || 3000;
+      const server = await startServer(portNum);
+      const actualPort = server.address().port;
+      console.log(formatSuccess(`Repo-Lens Web Studio is running at: http://localhost:${actualPort}`));
+      console.log(formatInfo('Press Ctrl+C to stop.'));
+    } catch (err) {
+      console.error(formatError(`Failed to start UI server: ${err.message}`));
+      process.exit(1);
+    }
+  });
 
 // Subcommand: compare
 program
