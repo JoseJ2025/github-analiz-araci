@@ -651,6 +651,11 @@
       alert('Mimari iskelet panoya kopyalandı! LLM promptuna yapıştırabilirsiniz.');
     }
 
+    // Auto-run initial analysis on load
+    window.addEventListener('DOMContentLoaded', () => {
+      runAnalysis();
+    });
+
     async function runComparison() {
       const tA = document.getElementById('targetA-input').value.trim();
       const tB = document.getElementById('targetB-input').value.trim();
